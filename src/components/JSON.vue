@@ -11,7 +11,12 @@
       <!-- Activity 6: Render a list containing author names and their birth years. Hint: Make use of the v-for directive to iterate through the array of authors. -->
       <!-- TODO: CODE TO RENDER LIST OF AUTHORS HERE -->
       <ul>
-        <li v-for="author in authors" :key="author.id">
+        <li
+          v-for="author in authors"
+          :key="author.id"
+          :class="{ highlight: isOrwell(author) }"
+          :style="isOrwell(author) ? highlightStyle : {}"
+        >
           {{ author.name }} ({{ author.birthYear }})
         </li>
       </ul>
@@ -21,7 +26,12 @@
       <p>Authors born after 1850:</p>
       <!-- TODO: CODE TO RENDER LIST OF AUTHORS HERE -->
       <ul>
-        <li v-for="author in modernAuthors" :key="author.id">
+        <li
+          v-for="author in modernAuthors"
+          :key="author.id"
+          :class="{ highlight: isOrwell(author) }"
+          :style="isOrwell(author) ? highlightStyle : {}"
+        >
           {{ author.name }} ({{ author.birthYear }})
         </li>
       </ul>
@@ -105,6 +115,15 @@ import { ref, computed } from 'vue'
 // TODO: CODE TO IMPORT JSON FILES HERE
 import authors from '../assets/json/authors.json'
 import bookstores from '../assets/json/bookstores.json'
+
+const isOrwell = (author) => author.name === 'George Orwell'
+
+const highlightStyle = {
+  color: 'white',
+  fontWeight: 'bold',
+  backgroundColor: '#42b883',
+  border: '1px solid #42b883',
+}
 
 const showMessage = ref(false)
 
