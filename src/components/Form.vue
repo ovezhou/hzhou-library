@@ -27,13 +27,21 @@
 <template>
   <div class="container mt-5">
     <div class="row">
-      <div class="col-md-12">
+      <div class="container">
         <h1 class="text-center">User Information Form</h1>
         <form @submit.prevent="submitForm">
           <div class="row mb-3">
             <div class="col-6 col-md-6">
               <label for="username" class="form-label">Username</label>
-              <input type="text" class="form-control" id="username" v-model="formData.username" />
+              <input
+                type="text"
+                class="form-control"
+                id="username"
+                @blur="() => validateName(true)"
+                @input="() => validateName(false)"
+                v-model="formData.username"
+              />
+              <div v-if="errors.username" class="text-danger">{{ errors.username }}</div>
             </div>
             <div class="col-6 col-md-6">
               <label for="password" class="form-label">Password</label>
@@ -41,8 +49,11 @@
                 type="password"
                 class="form-control"
                 id="password"
+                @blur="() => ValidatePassword(true)"
+                @input="() => ValidatePassword(false)"
                 v-model="formData.password"
               />
+              <div v-if="errors.password" class="text-danger">{{ errors.password }}</div>
             </div>
           </div>
           <div class="row mb-3">
@@ -83,10 +94,44 @@
       </div>
     </div>
   </div>
+  <!-- <div class="row mt-5" v-if="submittedCards.length">
+    <div class="d-flex flex-wrap justify-content-start">
+      <div
+        v-for="(card, index) in submittedCards"
+        :key="index"
+        class="card m-2"
+        style="width: 18rem"
+      >
+        <div class="card-header">User Information</div>
+        <ul class="list-group list-group-flush">
+          <li class="list-group-item">Username: {{ card.username }}</li>
+          <li class="list-group-item">Password: {{ card.password }}</li>
+          <li class="list-group-item">
+            Australian Resident: {{ card.isAustralian ? 'Yes' : 'No' }}
+          </li>
+          <li class="list-group-item">Gender: {{ card.gender }}</li>
+          <li class="list-group-item">Reason: {{ card.reason }}</li>
+        </ul>
+      </div>
+    </div>
+  </div> -->
+  <div class="mt-5" v-if="submittedCards.length">
+    <DataTable :value="submittedCards" stripedRows tableStyle="width:100%">
+      <Column field="username" header="Username" />
+      <Column field="password" header="Password" />
+      <Column header="Australian Resident">
+        <template #body="{ data }">{{ data.isAustralian ? 'Yes' : 'No' }}</template>
+      </Column>
+      <Column field="gender" header="Gender" />
+      <Column field="reason" header="Reason" />
+    </DataTable>
+  </div>
 </template>
 
 <script setup>
 import { ref } from 'vue'
+import DataTable from 'primevue/datatable'
+import Column from 'primevue/column'
 
 const formData = ref({
   username: '',
@@ -99,9 +144,51 @@ const formData = ref({
 const submittedCards = ref([])
 
 const submitForm = () => {
-  submittedCards.value.push({
-    ...formData.value,
-  })
+  validateName(true)
+  ValidatePassword(true)
+  if (!errors.value.username && !errors.value.password) {
+    submittedCards.value.push({ ...formData.value })
+    cleanForm()
+  }
+}
+
+const errors = ref({
+  username: null,
+  password: null,
+  isAustralian: null,
+  gender: null,
+  reason: null,
+})
+
+const validateName = (blur) => {
+  if (formData.value.username.length < 3) {
+    if (blur) errors.value.username = 'Name must be at least 3 characters'
+  } else {
+    errors.value.username = null
+  }
+}
+
+const ValidatePassword = (blur) => {
+  const password = formData.value.password
+  const minLength = 8
+  const hasUppercase = /[A-Z]/.test(password)
+  const hasLowercase = /[a-z]/.test(password)
+  const hasNumber = /\d/.test(password)
+  const hasSpecialChar = /[!@#$%^&*(),.?":{}|<>]/.test(password)
+
+  if (password.length < minLength) {
+    if (blur) errors.value.password = `Password must be at least ${minLength} characters long.`
+  } else if (!hasUppercase) {
+    if (blur) errors.value.password = 'Password must contain at least one uppercase letter.'
+  } else if (!hasLowercase) {
+    if (blur) errors.value.password = 'Password must contain at least one lowercase letter.'
+  } else if (!hasNumber) {
+    if (blur) errors.value.password = 'Password must contain at least one number.'
+  } else if (!hasSpecialChar) {
+    if (blur) errors.value.password = 'Password must contain at least one special character.'
+  } else {
+    errors.value.password = null
+  }
 }
 </script>
 
