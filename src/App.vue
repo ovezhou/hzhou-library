@@ -1,19 +1,51 @@
 <script setup>
-import BHeader from './components/BHeader.vue'
-import JSONView from './components/JSON.vue'
-import LibraryRegistrationForm from './components/LibraryRegistrationForm.vue'
+import { computed, onMounted } from 'vue'
+import { useRouter } from 'vue-router'
+import { signOut } from 'firebase/auth'
+import { auth } from '@/firebase/init'
+import { authState, hydrateFromLocalStorage } from '@/stores/authState'
+import BHeader from '@/components/BHeader.vue'
+
+onMounted(hydrateFromLocalStorage)
+
+const router = useRouter()
+const email = computed(() => authState.email)
+const role = computed(() => authState.role)
+
+const logout = async () => {
+  await signOut(auth)
+  localStorage.removeItem('uid')
+  localStorage.removeItem('email')
+  localStorage.removeItem('role')
+
+  authState.uid = ''
+  authState.email = ''
+  authState.role = ''
+
+  router.replace('/firelogin')
+}
 </script>
 
 <template>
   <div class="main-container">
     <header class="nav-header">
       <BHeader />
+      <div class="auth-inline">
+        <span v-if="email">
+          {{ email }}
+          <span v-if="role"> ({{ role }})</span>
+        </span>
+        <span v-else>Guest</span>
+        <button v-if="email" class="btn btn-outline-secondary btn-sm ms-2" @click="logout">
+          Logout
+        </button>
+      </div>
     </header>
 
     <main class="main-box">
       <!-- <JSONView />
       <LibraryRegistrationForm /> -->
-      <router-view></router-view>
+      <router-view />
     </main>
   </div>
 </template>
@@ -33,19 +65,11 @@ import LibraryRegistrationForm from './components/LibraryRegistrationForm.vue'
   border-bottom: 1px solid #ddd;
 }
 
-.nav-links {
-  display: flex;
-  gap: 1rem;
-}
-
-.nav-link {
-  text-decoration: none;
-  color: #007bff;
-}
-
-.nav-link.router-link-exact-active {
-  font-weight: bold;
-  color: #0056b3;
+.auth-inline {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.95rem;
 }
 
 .main-box {
