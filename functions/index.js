@@ -72,3 +72,33 @@ exports.capitalizeBookData = onDocumentCreated('books/{bookId}', async (event) =
   await admin.firestore().collection('books').doc(bookId).set(updatedData, { merge: true })
   console.log(`Capitalised data for book ${bookId}`)
 })
+
+exports.getAllBooks = onRequest({ region: 'us-central1' }, async (req, res) => {
+  res.set('Access-Control-Allow-Origin', '*')
+  res.set('Vary', 'Origin')
+
+  if (req.method === 'OPTIONS') {
+    res.set('Access-Control-Allow-Methods', 'GET,OPTIONS')
+    res.set('Access-Control-Allow-Headers', 'Content-Type, Authorization')
+    res.set('Access-Control-Max-Age', '3600')
+    return res.status(204).send('')
+  }
+
+  try {
+    if (req.method !== 'GET') {
+      return res.status(405).send('Method Not Allowed')
+    }
+
+    const snapshot = await admin.firestore().collection('books').get()
+    const books = snapshot.docs.map((doc) => ({
+      id: doc.id,
+      ...doc.data(),
+    }))
+
+    res.set('Access-Control-Allow-Origin', '*')
+    return res.status(200).json(books)
+  } catch (error) {
+    logger.error('Error getting all books:', error)
+    return res.status(500).send('Error getting all books')
+  }
+})
