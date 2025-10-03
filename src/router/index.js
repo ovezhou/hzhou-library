@@ -6,8 +6,14 @@ import FirebaseRegisterView from '@/views/FirebaseRegisterView.vue'
 import AddBookView from '@/views/AddBookView.vue'
 import LoginView from '@/views/LoginView.vue'
 import AdminView from '@/views/AdminView.vue'
+import GetBookCountView from '@/views/GetBookCountView.vue'
 
 const routes = [
+  {
+    path: '/getbookcount',
+    name: '/GetBookCount',
+    component: GetBookCountView,
+  },
   {
     path: '/admin',
     name: 'Admin',
