@@ -1,6 +1,7 @@
 import { createRouter, createWebHistory } from 'vue-router'
-import HomeView from '../views/HomeView.vue'
-import AboutView from '../views/AboutView.vue'
+
+import HomeView from '@/views/HomeView.vue'
+import AboutView from '@/views/AboutView.vue'
 import FirebaseSigninView from '@/views/FirebaseSigninView.vue'
 import FirebaseRegisterView from '@/views/FirebaseRegisterView.vue'
 import AddBookView from '@/views/AddBookView.vue'
@@ -11,67 +12,27 @@ import WeatherView from '@/views/WeatherView.vue'
 import CountBookAPI from '@/views/CountBookAPI.vue'
 import GetAllBookAPI from '@/views/GetAllBookAPI.vue'
 
-const routes = [
-  {
-    path: '/getallbookapi',
-    name: '/GetAllBookAPI',
-    component: GetAllBookAPI,
-  },
-  {
-    path: '/countbookapi',
-    name: '/CountBookAPI',
-    component: CountBookAPI,
-  },
-  {
-    path: '/weathercheck',
-    name: '/WeatherCheck',
-    component: WeatherView,
-  },
-  {
-    path: '/getbookcount',
-    name: '/GetBookCount',
-    component: GetBookCountView,
-  },
-  {
-    path: '/admin',
-    name: 'Admin',
-    component: AdminView,
-  },
-  {
-    path: '/login',
-    name: 'Login',
-    component: LoginView,
-  },
-  {
-    path: '/addbook',
-    name: 'AddBook',
-    component: AddBookView,
-  },
-  {
-    path: '/fireregister',
-    name: 'FireRegister',
-    component: FirebaseRegisterView,
-  },
-  {
-    path: '/firelogin',
-    name: 'FireLogin',
-    component: FirebaseSigninView,
-  },
-  {
-    path: '/',
-    name: 'Home',
-    component: HomeView,
-  },
-  {
-    path: '/about',
-    name: 'About',
-    component: AboutView,
-  },
-]
-
 const router = createRouter({
-  history: createWebHistory(),
-  routes,
+  history: createWebHistory(import.meta.env.BASE_URL),
+  routes: [
+    { path: '/', name: 'Home', component: HomeView },
+    { path: '/about', name: 'About', component: AboutView },
+    { path: '/firelogin', name: 'FireLogin', component: FirebaseSigninView },
+    { path: '/fireregister', name: 'FireRegister', component: FirebaseRegisterView },
+    { path: '/addbook', name: 'AddBook', component: AddBookView },
+    { path: '/login', name: 'Login', component: LoginView },
+    { path: '/admin', name: 'Admin', component: AdminView },
+    { path: '/getbookcount', name: 'GetBookCount', component: GetBookCountView },
+    { path: '/weathercheck', name: 'WeatherCheck', component: WeatherView },
+    { path: '/countbookapi', name: 'CountBookAPI', component: CountBookAPI },
+    { path: '/getallbookapi', name: 'GetAllBookAPI', component: GetAllBookAPI },
+
+    { path: '/:pathMatch(.*)*', redirect: '/' },
+  ],
+
+  scrollBehavior() {
+    return { top: 0 }
+  },
 })
 
 router.beforeEach((to, from, next) => {
